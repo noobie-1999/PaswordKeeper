@@ -65,6 +65,7 @@ def get_passwords():
             for res in result:
                 temp_dict = {}
                 temp_dict['website'] = res[3]
+                temp_dict['username'] = res[4]
                 temp_dict['password'] = decrypt(res[2])
                 print(temp_dict)
                 password_list.append(temp_dict)
@@ -79,8 +80,13 @@ def save_new_password():
         data = request.get_json()
         website = data['website']
         password = encrypt(data['password'])
+        username = data['username']
+        print(username+" "+password+" "+website)
         cursor = mysql.connection.cursor()
-        cursor.execute("INSERT INTO PASSWORDS(user_id, password, websites) values(%s,%s,%s)",(int(user_id),password, website))
+        try:
+            cursor.execute("INSERT INTO PASSWORDS(user_id, password, websites, username) values(%s,%s,%s,%s)",(int(user_id),password, website, username))
+        except:
+            return "SQL"
         mysql.connection.commit()
         cursor.close()
         return jsonify({"status":"success"})
